@@ -1,0 +1,42 @@
+digraph STM {
+  compound=true;
+  rankdir="LR";
+  style=rounded;
+  node [style=rounded, shape=box];
+
+  subgraph cluster_ST1 {
+   label="ST1";
+   ST1 [style=invis];
+   H13 [shape = circle];
+   H14 [shape = circle];
+
+   subgraph cluster_ST11 {
+      label="ST11";
+      ST11[style=invis];
+   }
+
+   subgraph cluster_ST12 {
+      label="ST12";
+      ST12 [style=invis];
+      ST121;
+      ST122;
+
+      ST121 -> ST122[label="tr121(EV121)"];
+      ST122 -> ST121[label="tr122(EV122)"];
+   }
+
+   ST11 -> ST12 [label="tr11(EV11)",ltail=cluster_ST11,lhead=cluster_ST12];
+   ST12 -> ST11 [label="tr12(EV12)",ltail=cluster_ST12,lhead=cluster_ST11];
+  }
+
+  subgraph cluster_ST2 {
+   label="ST2";
+   ST2 [style=invis];
+  }
+
+  ST1 -> ST2 [label="tr1(EV1)",ltail=cluster_ST1,lhead=cluster_ST2];
+  ST2 -> ST1 [label="tr2(EV2)",ltail=cluster_ST2,lhead=cluster_ST1];
+
+  ST2 -> H13 [label="tr13(EV3)",ltail=cluster_ST2];
+  ST2 -> H14 [label="tr14(EV4)",ltail=cluster_ST2];
+}
