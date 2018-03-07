@@ -1,36 +1,27 @@
+LIBNAME=stm
+BASE_VERSION=1
+SUB_VERSION=0.0
+DOCS_DIR=docs
+CC=gcc
+CFLAGS=
 
-LIBNAME=libstm
+objects:=$(patsubst %.c,%.o,$(wildcard *.c))
 
-LIBDLINK_DIR=dlinkedlist
-LIBDLINK_OBJ=dlist.o
-
-INCLUDES= -I. -I$(LIBDLINK_DIR)
-CFLAGS= -MD -g -Wall -DNDEBUG
-LDFLAGS= -L.
-
-.PHONY: all clean dlist
-
-OBJS_ALL=$(patsubst %.c,%.o,$(wildcard *.c))
-OBJS_LIBS:=$(filter-out main.o,$(OBJS_ALL))
-
-all: dlist $(LIBNAME).a test 
-
-$(LIBNAME).a: $(OBJS_LIBS)
-	@$(AR) rcs $@ $(LIBDLINK_DIR)/$(LIBDLINK_OBJ) $^
-
-dlist:
-	@$(MAKE) -s -C $(LIBDLINK_DIR)
-
-%.o: %.c
-	@$(CC) $(INCLUDES) $(CFLAGS) -Wall -g -c $(DEFINE) $<
-
-test:
-	@$(MAKE) -s -C test
-
-clean: 
-	@$(MAKE) -s -C $(LIBDLINK_DIR) clean
-	@$(MAKE) -s -C test clean
-	@/bin/rm -rf *.o *~ *.d $(LIBNAME).a
+all: libstm.so libstm.a
 
 doc:
-	@dot -Tpng graph.dot -o stm.png
+	@dot && dot -Tpng $(DOCS_DIR)/graph.dot -o $(DOCS_DIR)/stm.png
+
+libstm.so: $(objects)
+	@$(CC) -shared -Wl -o $@ $^ $(CFLAGS)
+#	@$(CC) -shared -Wl,-install_name,lib$(LIBNAME).so.$(BASE_VERSION) \
+    -o lib$(LIBNAME).so.$(BASE_VERSION).$(SUB_VERSION) $^ $(CFLAGS)
+
+libstm.a: $(objects)
+	@$(AR) -r -o $@ $^
+
+%.o: %.c
+	@$(CC) $(CFLAGS) -Wall -g -c $(DEFINE) $<
+
+clean: 
+	/bin/rm -rf *.o *~ lib$(LIBNAME)* 
